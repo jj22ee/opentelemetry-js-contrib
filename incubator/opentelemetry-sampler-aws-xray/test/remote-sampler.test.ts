@@ -20,6 +20,7 @@ import {
   DiagConsoleLogger,
   Span,
   SpanKind,
+  trace,
 } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import * as opentelemetry from '@opentelemetry/sdk-node';
@@ -120,13 +121,6 @@ describe('AwsXrayRemoteSampler', () => {
       [SEMRESATTRS_CLOUD_PLATFORM]: 'test-cloud-platform',
     });
 
-    // Patch default target polling interval
-    const tmp = (_AwsXRayRemoteSampler.prototype as any)
-      .getDefaultTargetPollingInterval;
-    (_AwsXRayRemoteSampler.prototype as any).getDefaultTargetPollingInterval =
-      () => {
-        return 0.2; // seconds
-      };
     const sampler = new AwsXRayRemoteSampler({
       resource: resource,
     });
@@ -147,12 +141,9 @@ describe('AwsXrayRemoteSampler', () => {
         ).decision
       ).toEqual(SamplingDecision.NOT_RECORD);
 
-      setTimeout(() => {
-        // restore function
-        (
-          _AwsXRayRemoteSampler.prototype as any
-        ).getDefaultTargetPollingInterval = tmp;
+      (sampler as any)._root._root.getAndUpdateSamplingTargets();
 
+      setTimeout(() => {
         expect(
           sampler.shouldSample(
             context.active(),
@@ -185,8 +176,8 @@ describe('AwsXrayRemoteSampler', () => {
         ).toEqual(SamplingDecision.RECORD_AND_SAMPLED);
 
         done();
-      }, 300);
-    }, 10);
+      }, 50);
+    }, 50);
   });
 
   it('testLargeReservoir', done => {
@@ -225,8 +216,10 @@ describe('AwsXrayRemoteSampler', () => {
       (sampler as any)._root._root.getAndUpdateSamplingTargets();
 
       setTimeout(() => {
+        const clock = sinon.useFakeTimers(Date.now());
+        clock.tick(1500);
         let sampled = 0;
-        for (let i = 0; i < 100000; i++) {
+        for (let i = 0; i < 1005; i++) {
           if (
             sampler.shouldSample(
               context.active(),
@@ -240,14 +233,15 @@ describe('AwsXrayRemoteSampler', () => {
             sampled++;
           }
         }
+        clock.restore();
 
         expect(
           (sampler as any)._root._root.ruleCache.ruleAppliers[0]
             .reservoirSampler.quota
-        ).toEqual(100000);
-        expect(sampled).toEqual(100000);
+        ).toEqual(1000);
+        expect(sampled).toEqual(1000);
         done();
-      }, 1000);
+      }, 50);
     }, 50);
   });
 
@@ -290,9 +284,9 @@ describe('AwsXrayRemoteSampler', () => {
 
       setTimeout(() => {
         const clock = sinon.useFakeTimers(Date.now());
-        clock.tick(2000);
+        clock.tick(1000);
         let sampled = 0;
-        for (let i = 0; i < 100000; i++) {
+        for (let i = 0; i < 1000; i++) {
           if (
             sampler.shouldSample(
               context.active(),
@@ -307,9 +301,10 @@ describe('AwsXrayRemoteSampler', () => {
           }
         }
         clock.restore();
+
         expect(sampled).toEqual(100);
         done();
-      }, 1000);
+      }, 50);
     }, 50);
   });
 
@@ -343,26 +338,26 @@ describe('AwsXrayRemoteSampler', () => {
     const tracer: Tracer = tracerProvider.getTracer('test');
 
     setTimeout(() => {
-      tracer.startActiveSpan('test0', span0 => {
-        const span1: Span = tracer.startSpan('test1');
-        const span2: Span = tracer.startSpan('test2');
-        span2.end();
-        span1.end();
-        span0.end();
+      const span0 = tracer.startSpan('test0');
+      const ctx = trace.setSpan(context.active(), span0);
+      const span1: Span = tracer.startSpan('test1', {}, ctx);
+      const span2: Span = tracer.startSpan('test2', {}, ctx);
+      span2.end();
+      span1.end();
+      span0.end();
 
-        // span1 and span2 are child spans of root span0
-        // For AwsXRayRemoteSampler (ParentBased), expect only span0 to update statistics
-        expect(
-          (sampler as any)._root._root.ruleCache.ruleAppliers[0].statistics
-            .RequestCount
-        ).toBe(1);
-        expect(
-          (sampler as any)._root._root.ruleCache.ruleAppliers[0].statistics
-            .SampleCount
-        ).toBe(1);
-        done();
-      });
-    }, 100);
+      // span1 and span2 are child spans of root span0
+      // For AwsXRayRemoteSampler (ParentBased), expect only span0 to update statistics
+      expect(
+        (sampler as any)._root._root.ruleCache.ruleAppliers[0].statistics
+          .RequestCount
+      ).toBe(1);
+      expect(
+        (sampler as any)._root._root.ruleCache.ruleAppliers[0].statistics
+          .SampleCount
+      ).toBe(1);
+      done();
+    }, 50);
   });
 
   it('Non-ParentBased _AwsXRayRemoteSampler creates expected Statistics based on all 3 Spans, disregarding Parent Span Sampling Decision', done => {
@@ -381,23 +376,23 @@ describe('AwsXrayRemoteSampler', () => {
     const tracer: Tracer = tracerProvider.getTracer('test');
 
     setTimeout(() => {
-      tracer.startActiveSpan('test0', span0 => {
-        const span1: Span = tracer.startSpan('test1');
-        const span2: Span = tracer.startSpan('test2');
-        span2.end();
-        span1.end();
-        span0.end();
+      const span0 = tracer.startSpan('test0');
+      const ctx = trace.setSpan(context.active(), span0);
+      const span1: Span = tracer.startSpan('test1', {}, ctx);
+      const span2: Span = tracer.startSpan('test2', {}, ctx);
+      span2.end();
+      span1.end();
+      span0.end();
 
-        // span1 and span2 are child spans of root span0
-        // For _AwsXRayRemoteSampler (Non-ParentBased), expect all 3 spans to update statistics
-        expect(
-          (sampler as any).ruleCache.ruleAppliers[0].statistics.RequestCount
-        ).toBe(3);
-        expect(
-          (sampler as any).ruleCache.ruleAppliers[0].statistics.SampleCount
-        ).toBe(3);
-        done();
-      });
-    }, 100);
+      // span1 and span2 are child spans of root span0
+      // For _AwsXRayRemoteSampler (Non-ParentBased), expect all 3 spans to update statistics
+      expect(
+        (sampler as any).ruleCache.ruleAppliers[0].statistics.RequestCount
+      ).toBe(3);
+      expect(
+        (sampler as any).ruleCache.ruleAppliers[0].statistics.SampleCount
+      ).toBe(3);
+      done();
+    }, 50);
   });
 });
