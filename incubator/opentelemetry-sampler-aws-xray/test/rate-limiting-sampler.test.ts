@@ -35,8 +35,14 @@ describe('RateLimitingSampler', () => {
     let sampled = 0;
     for (let i = 0; i < 100; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -48,8 +54,14 @@ describe('RateLimitingSampler', () => {
     sampled = 0;
     for (let i = 0; i < 100; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -61,8 +73,14 @@ describe('RateLimitingSampler', () => {
     sampled = 0;
     for (let i = 0; i < 100; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -74,8 +92,14 @@ describe('RateLimitingSampler', () => {
     sampled = 0;
     for (let i = 0; i < 100; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -87,8 +111,14 @@ describe('RateLimitingSampler', () => {
     sampled = 0;
     for (let i = 0; i < 100; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -102,8 +132,14 @@ describe('RateLimitingSampler', () => {
     let sampled = 0;
     for (let i = 0; i < 50; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -115,8 +151,14 @@ describe('RateLimitingSampler', () => {
     sampled = 0;
     for (let i = 0; i < 50; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -128,8 +170,14 @@ describe('RateLimitingSampler', () => {
     sampled = 0;
     for (let i = 0; i < 50; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -141,8 +189,14 @@ describe('RateLimitingSampler', () => {
     sampled = 0;
     for (let i = 0; i < 50; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }

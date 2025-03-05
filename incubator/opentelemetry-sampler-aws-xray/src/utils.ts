@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import { AttributeValue, Attributes, diag } from '@opentelemetry/api';
 import {
   CLOUDPLATFORMVALUES_AWS_EC2,
@@ -26,7 +25,8 @@ import {
 
 export const CLOUD_PLATFORM_MAPPING: { [cloudPlatformKey: string]: string } = {
   [CLOUDPLATFORMVALUES_AWS_LAMBDA]: 'AWS::Lambda::Function',
-  [CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK]: 'AWS::ElasticBeanstalk::Environment',
+  [CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK]:
+    'AWS::ElasticBeanstalk::Environment',
   [CLOUDPLATFORMVALUES_AWS_EC2]: 'AWS::EC2::Instance',
   [CLOUDPLATFORMVALUES_AWS_ECS]: 'AWS::ECS::Container',
   [CLOUDPLATFORMVALUES_AWS_EKS]: 'AWS::EKS::Container',
@@ -42,15 +42,22 @@ function convertPatternToRegExp(pattern: string): string {
   return escapeRegExp(pattern).replace(/\*/g, '.*').replace(/\?/g, '.');
 }
 
-export function wildcardMatch(pattern?: string, text?: AttributeValue): boolean {
+export function wildcardMatch(
+  pattern?: string,
+  text?: AttributeValue
+): boolean {
   if (pattern === '*') return true;
   if (pattern === undefined || typeof text !== 'string') return false;
   if (pattern.length === 0) return text.length === 0;
 
-  const match: RegExpMatchArray | null = text.toLowerCase().match(`^${convertPatternToRegExp(pattern.toLowerCase())}$`);
+  const match: RegExpMatchArray | null = text
+    .toLowerCase()
+    .match(`^${convertPatternToRegExp(pattern.toLowerCase())}$`);
 
   if (match === null) {
-    diag.debug(`WildcardMatch: no match found for ${text} against pattern ${pattern}`);
+    diag.debug(
+      `WildcardMatch: no match found for ${text} against pattern ${pattern}`
+    );
     return false;
   }
 
@@ -73,9 +80,11 @@ export function attributeMatch(
     return false;
   }
 
-  let matchedCount: number = 0;
+  let matchedCount = 0;
   for (const [key, value] of Object.entries(attributes)) {
-    const foundKey: string | undefined = Object.keys(ruleAttributes).find(ruleKey => ruleKey === key);
+    const foundKey: string | undefined = Object.keys(ruleAttributes).find(
+      ruleKey => ruleKey === key
+    );
 
     if (foundKey === undefined) {
       continue;

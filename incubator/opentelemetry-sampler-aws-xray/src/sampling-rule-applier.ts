@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
-
-import { AttributeValue, Attributes, Context, Link, SpanKind } from '@opentelemetry/api';
+import {
+  AttributeValue,
+  Attributes,
+  Context,
+  Link,
+  SpanKind,
+} from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
-import { SamplingDecision, SamplingResult, TraceIdRatioBasedSampler } from '@opentelemetry/sdk-trace-base';
+import {
+  SamplingDecision,
+  SamplingResult,
+  TraceIdRatioBasedSampler,
+} from '@opentelemetry/sdk-trace-base';
 import {
   ATTR_CLIENT_ADDRESS,
   ATTR_HTTP_REQUEST_METHOD,
@@ -38,7 +47,11 @@ import {
   SEMRESATTRS_SERVICE_NAME,
 } from '@opentelemetry/semantic-conventions';
 import { RateLimitingSampler } from './rate-limiting-sampler';
-import { ISamplingRule, ISamplingStatistics, SamplingTargetDocument } from './remote-sampler.types';
+import {
+  ISamplingRule,
+  ISamplingStatistics,
+  SamplingTargetDocument,
+} from './remote-sampler.types';
 import { SamplingRule } from './sampling-rule';
 import { Statistics } from './statistics';
 import { CLOUD_PLATFORM_MAPPING, attributeMatch, wildcardMatch } from './utils';
@@ -54,10 +67,16 @@ export class SamplingRuleApplier {
   private borrowingEnabled: boolean;
   private reservoirExpiryTimeInMillis: number;
 
-  constructor(samplingRule: ISamplingRule, statistics: Statistics = new Statistics(), target?: SamplingTargetDocument) {
+  constructor(
+    samplingRule: ISamplingRule,
+    statistics: Statistics = new Statistics(),
+    target?: SamplingTargetDocument
+  ) {
     this.samplingRule = new SamplingRule(samplingRule);
 
-    this.fixedRateSampler = new TraceIdRatioBasedSampler(this.samplingRule.FixedRate);
+    this.fixedRateSampler = new TraceIdRatioBasedSampler(
+      this.samplingRule.FixedRate
+    );
     if (samplingRule.ReservoirSize > 0) {
       this.reservoirSampler = new RateLimitingSampler(1);
     } else {
@@ -76,7 +95,9 @@ export class SamplingRuleApplier {
       }
 
       if (target.ReservoirQuotaTTL) {
-        this.reservoirExpiryTimeInMillis = new Date(target.ReservoirQuotaTTL * 1000).getTime();
+        this.reservoirExpiryTimeInMillis = new Date(
+          target.ReservoirQuotaTTL * 1000
+        ).getTime();
       } else {
         this.reservoirExpiryTimeInMillis = Date.now();
       }
@@ -88,7 +109,11 @@ export class SamplingRuleApplier {
   }
 
   public withTarget(target: SamplingTargetDocument): SamplingRuleApplier {
-    const newApplier: SamplingRuleApplier = new SamplingRuleApplier(this.samplingRule, this.statistics, target);
+    const newApplier: SamplingRuleApplier = new SamplingRuleApplier(
+      this.samplingRule,
+      this.statistics,
+      target
+    );
     return newApplier;
   }
 
@@ -100,10 +125,16 @@ export class SamplingRuleApplier {
     let serviceName: AttributeValue | undefined = undefined;
 
     if (attributes) {
-      httpTarget = attributes[SEMATTRS_HTTP_TARGET] ?? attributes[ATTR_URL_PATH];
+      httpTarget =
+        attributes[SEMATTRS_HTTP_TARGET] ?? attributes[ATTR_URL_PATH];
       httpUrl = attributes[SEMATTRS_HTTP_URL] ?? attributes[ATTR_URL_FULL];
-      httpMethod = attributes[SEMATTRS_HTTP_METHOD] ?? attributes[ATTR_HTTP_REQUEST_METHOD];
-      httpHost = attributes[SEMATTRS_HTTP_HOST] ?? attributes[ATTR_SERVER_ADDRESS] ?? attributes[ATTR_CLIENT_ADDRESS];
+      httpMethod =
+        attributes[SEMATTRS_HTTP_METHOD] ??
+        attributes[ATTR_HTTP_REQUEST_METHOD];
+      httpHost =
+        attributes[SEMATTRS_HTTP_HOST] ??
+        attributes[ATTR_SERVER_ADDRESS] ??
+        attributes[ATTR_CLIENT_ADDRESS];
     }
 
     let serviceType: AttributeValue | undefined = undefined;
@@ -111,7 +142,8 @@ export class SamplingRuleApplier {
 
     if (resource) {
       serviceName = resource.attributes[SEMRESATTRS_SERVICE_NAME] || '';
-      const cloudPlatform: AttributeValue | undefined = resource.attributes[SEMRESATTRS_CLOUD_PLATFORM];
+      const cloudPlatform: AttributeValue | undefined =
+        resource.attributes[SEMRESATTRS_CLOUD_PLATFORM];
       if (typeof cloudPlatform === 'string') {
         serviceType = CLOUD_PLATFORM_MAPPING[cloudPlatform];
       }
@@ -153,22 +185,33 @@ export class SamplingRuleApplier {
     attributes: Attributes,
     links: Link[]
   ): SamplingResult {
-    let hasBorrowed: boolean = false;
+    let hasBorrowed = false;
     let result: SamplingResult = { decision: SamplingDecision.NOT_RECORD };
 
     const nowInMillis: number = Date.now();
-    const reservoirExpired: boolean = nowInMillis >= this.reservoirExpiryTimeInMillis;
+    const reservoirExpired: boolean =
+      nowInMillis >= this.reservoirExpiryTimeInMillis;
 
     if (!reservoirExpired) {
-      result = this.reservoirSampler.shouldSample(context, traceId, spanName, spanKind, attributes, links);
-      hasBorrowed = this.borrowingEnabled && result.decision !== SamplingDecision.NOT_RECORD;
+      result = this.reservoirSampler.shouldSample(
+        context,
+        traceId,
+        spanName,
+        spanKind,
+        attributes,
+        links
+      );
+      hasBorrowed =
+        this.borrowingEnabled &&
+        result.decision !== SamplingDecision.NOT_RECORD;
     }
 
     if (result.decision === SamplingDecision.NOT_RECORD) {
       result = this.fixedRateSampler.shouldSample(context, traceId);
     }
 
-    this.statistics.SampleCount += result.decision !== SamplingDecision.NOT_RECORD ? 1 : 0;
+    this.statistics.SampleCount +=
+      result.decision !== SamplingDecision.NOT_RECORD ? 1 : 0;
     this.statistics.BorrowCount += hasBorrowed ? 1 : 0;
     this.statistics.RequestCount += 1;
 
@@ -181,21 +224,32 @@ export class SamplingRuleApplier {
     return statisticsCopy;
   }
 
-  private getArn(resource: Resource, attributes: Attributes): AttributeValue | undefined {
+  private getArn(
+    resource: Resource,
+    attributes: Attributes
+  ): AttributeValue | undefined {
     let arn: AttributeValue | undefined =
       resource.attributes[SEMRESATTRS_AWS_ECS_CONTAINER_ARN] ||
       resource.attributes[SEMRESATTRS_AWS_ECS_CLUSTER_ARN] ||
       resource.attributes[SEMRESATTRS_AWS_EKS_CLUSTER_ARN];
 
-    if (arn === undefined && resource?.attributes[SEMRESATTRS_CLOUD_PLATFORM] === CLOUDPLATFORMVALUES_AWS_LAMBDA) {
+    if (
+      arn === undefined &&
+      resource?.attributes[SEMRESATTRS_CLOUD_PLATFORM] ===
+        CLOUDPLATFORMVALUES_AWS_LAMBDA
+    ) {
       arn = this.getLambdaArn(resource, attributes);
     }
     return arn;
   }
 
-  private getLambdaArn(resource: Resource, attributes: Attributes): AttributeValue | undefined {
+  private getLambdaArn(
+    resource: Resource,
+    attributes: Attributes
+  ): AttributeValue | undefined {
     const arn: AttributeValue | undefined =
-      resource?.attributes[SEMRESATTRS_FAAS_ID] || attributes[SEMATTRS_AWS_LAMBDA_INVOKED_ARN];
+      resource?.attributes[SEMRESATTRS_FAAS_ID] ||
+      attributes[SEMATTRS_AWS_LAMBDA_INVOKED_ARN];
     return arn;
   }
 }

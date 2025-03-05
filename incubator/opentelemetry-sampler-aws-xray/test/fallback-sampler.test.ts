@@ -35,14 +35,27 @@ describe('FallBackSampler', () => {
   it('testShouldSample', () => {
     const sampler = new FallbackSampler();
 
-    sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []);
+    sampler.shouldSample(
+      context.active(),
+      '1234',
+      'name',
+      SpanKind.CLIENT,
+      {},
+      []
+    );
 
     // 0 seconds passed, 0 quota available
     let sampled = 0;
     for (let i = 0; i < 30; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -54,8 +67,14 @@ describe('FallBackSampler', () => {
     clock.tick(0.4 * 1000);
     for (let i = 0; i < 30; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -67,8 +86,14 @@ describe('FallBackSampler', () => {
     clock.tick(0.4 * 1000);
     for (let i = 0; i < 30; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -80,8 +105,14 @@ describe('FallBackSampler', () => {
     clock.tick(0.4 * 1000);
     for (let i = 0; i < 30; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -93,8 +124,14 @@ describe('FallBackSampler', () => {
     clock.tick(0.4 * 1000);
     for (let i = 0; i < 30; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -106,8 +143,14 @@ describe('FallBackSampler', () => {
     clock.tick(0.4 * 1000);
     for (let i = 0; i < 30; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -119,8 +162,14 @@ describe('FallBackSampler', () => {
     clock.tick(0.4 * 1000);
     for (let i = 0; i < 30; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }
@@ -132,8 +181,14 @@ describe('FallBackSampler', () => {
     clock.tick(100 * 1000);
     for (let i = 0; i < 30; i++) {
       if (
-        sampler.shouldSample(context.active(), '1234', 'name', SpanKind.CLIENT, {}, []).decision !==
-        SamplingDecision.NOT_RECORD
+        sampler.shouldSample(
+          context.active(),
+          '1234',
+          'name',
+          SpanKind.CLIENT,
+          {},
+          []
+        ).decision !== SamplingDecision.NOT_RECORD
       ) {
         sampled += 1;
       }

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import { ISamplingStatistics } from './remote-sampler.types';
 
 export class Statistics implements ISamplingStatistics {
@@ -22,7 +21,7 @@ export class Statistics implements ISamplingStatistics {
   public SampleCount: number;
   public BorrowCount: number;
 
-  constructor(requestCount: number = 0, sampleCount: number = 0, borrowCount: number = 0) {
+  constructor(requestCount = 0, sampleCount = 0, borrowCount = 0) {
     this.RequestCount = requestCount;
     this.SampleCount = sampleCount;
     this.BorrowCount = borrowCount;

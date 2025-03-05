@@ -21,7 +21,12 @@ import { RuleCache } from '../src/rule-cache';
 import { SamplingRule } from '../src/sampling-rule';
 import { SamplingRuleApplier } from '../src/sampling-rule-applier';
 
-const createRule = (name: string, priority: number, reservoirSize: number, fixedRate: number): SamplingRuleApplier => {
+const createRule = (
+  name: string,
+  priority: number,
+  reservoirSize: number,
+  fixedRate: number
+): SamplingRuleApplier => {
   const testSamplingRule = {
     RuleName: name,
     Priority: priority,
@@ -61,7 +66,9 @@ describe('RuleCache', () => {
 
     // Default rule should be removed because it doesn't exist in the new list
     expect((cache as any).ruleAppliers.length).toEqual(rules.length);
-    expect((cache as any).ruleAppliers[0].samplingRule.RuleName).toEqual('high');
+    expect((cache as any).ruleAppliers[0].samplingRule.RuleName).toEqual(
+      'high'
+    );
     expect((cache as any).ruleAppliers[1].samplingRule.RuleName).toEqual('A');
     expect((cache as any).ruleAppliers[2].samplingRule.RuleName).toEqual('Abc');
     expect((cache as any).ruleAppliers[3].samplingRule.RuleName).toEqual('ab');
@@ -100,9 +107,15 @@ describe('RuleCache', () => {
 
     // Check rule cache is still correct length and has correct rules
     expect((cache as any).ruleAppliers.length).toEqual(3);
-    expect((cache as any).ruleAppliers[0].samplingRule.RuleName).toEqual('rule_1');
-    expect((cache as any).ruleAppliers[1].samplingRule.RuleName).toEqual('new_rule_3');
-    expect((cache as any).ruleAppliers[2].samplingRule.RuleName).toEqual('rule_2');
+    expect((cache as any).ruleAppliers[0].samplingRule.RuleName).toEqual(
+      'rule_1'
+    );
+    expect((cache as any).ruleAppliers[1].samplingRule.RuleName).toEqual(
+      'new_rule_3'
+    );
+    expect((cache as any).ruleAppliers[2].samplingRule.RuleName).toEqual(
+      'rule_2'
+    );
 
     // Assert before and after of rule cache
     expect(ruleAppliersCopy[0]).toEqual((cache as any).ruleAppliers[0]);
@@ -119,13 +132,17 @@ describe('RuleCache', () => {
     const rules = [rule1];
     cache.updateRules(rules);
     expect((cache as any).ruleAppliers.length).toEqual(1);
-    expect((cache as any).ruleAppliers[0].samplingRule.RuleName).toEqual('first_rule');
+    expect((cache as any).ruleAppliers[0].samplingRule.RuleName).toEqual(
+      'first_rule'
+    );
 
     const replacement_rule1 = createRule('second_rule', 200, 0, 0.0);
     const replacementRules = [replacement_rule1];
     cache.updateRules(replacementRules);
     expect((cache as any).ruleAppliers.length).toEqual(1);
-    expect((cache as any).ruleAppliers[0].samplingRule.RuleName).toEqual('second_rule');
+    expect((cache as any).ruleAppliers[0].samplingRule.RuleName).toEqual(
+      'second_rule'
+    );
   });
 
   it('testUpdateSamplingTargets', () => {
@@ -134,11 +151,19 @@ describe('RuleCache', () => {
     const cache = new RuleCache(new Resource({}));
     cache.updateRules([rule1, rule2]);
 
-    expect(((cache as any).ruleAppliers[0] as any).reservoirSampler.quota).toEqual(1);
-    expect(((cache as any).ruleAppliers[0] as any).fixedRateSampler._ratio).toEqual(rule2.samplingRule.FixedRate);
+    expect(
+      ((cache as any).ruleAppliers[0] as any).reservoirSampler.quota
+    ).toEqual(1);
+    expect(
+      ((cache as any).ruleAppliers[0] as any).fixedRateSampler._ratio
+    ).toEqual(rule2.samplingRule.FixedRate);
 
-    expect(((cache as any).ruleAppliers[1] as any).reservoirSampler.quota).toEqual(1);
-    expect(((cache as any).ruleAppliers[1] as any).fixedRateSampler._ratio).toEqual(rule1.samplingRule.FixedRate);
+    expect(
+      ((cache as any).ruleAppliers[1] as any).reservoirSampler.quota
+    ).toEqual(1);
+    expect(
+      ((cache as any).ruleAppliers[1] as any).fixedRateSampler._ratio
+    ).toEqual(rule1.samplingRule.FixedRate);
 
     const time = Date.now() / 1000;
     const target1 = {
@@ -163,20 +188,38 @@ describe('RuleCache', () => {
       RuleName: 'associated rule does not exist',
     };
 
-    const targetMap = { default: target1, test: target2, 'associated rule does not exist': target3 };
-    const [refreshSamplingRules, nextPollingInterval] = cache.updateTargets(targetMap, time - 10);
+    const targetMap = {
+      default: target1,
+      test: target2,
+      'associated rule does not exist': target3,
+    };
+    const [refreshSamplingRules, nextPollingInterval] = cache.updateTargets(
+      targetMap,
+      time - 10
+    );
     expect(refreshSamplingRules).toEqual(false);
     expect(nextPollingInterval).toEqual(target2.Interval);
 
     // Ensure cache is still of length 2
     expect((cache as any).ruleAppliers.length).toEqual(2);
 
-    expect(((cache as any).ruleAppliers[0] as any).reservoirSampler.quota).toEqual(target2.ReservoirQuota);
-    expect(((cache as any).ruleAppliers[0] as any).fixedRateSampler._ratio).toEqual(target2.FixedRate);
-    expect(((cache as any).ruleAppliers[1] as any).reservoirSampler.quota).toEqual(target1.ReservoirQuota);
-    expect(((cache as any).ruleAppliers[1] as any).fixedRateSampler._ratio).toEqual(target1.FixedRate);
+    expect(
+      ((cache as any).ruleAppliers[0] as any).reservoirSampler.quota
+    ).toEqual(target2.ReservoirQuota);
+    expect(
+      ((cache as any).ruleAppliers[0] as any).fixedRateSampler._ratio
+    ).toEqual(target2.FixedRate);
+    expect(
+      ((cache as any).ruleAppliers[1] as any).reservoirSampler.quota
+    ).toEqual(target1.ReservoirQuota);
+    expect(
+      ((cache as any).ruleAppliers[1] as any).fixedRateSampler._ratio
+    ).toEqual(target1.FixedRate);
 
-    const [refreshSamplingRulesAfter, _] = cache.updateTargets(targetMap, time + 1);
+    const [refreshSamplingRulesAfter, _] = cache.updateTargets(
+      targetMap,
+      time + 1
+    );
     expect(refreshSamplingRulesAfter).toBe(true);
   });
 
@@ -193,7 +236,9 @@ describe('RuleCache', () => {
     clock.tick(1); // ms
 
     const clientId = '12345678901234567890abcd';
-    const statistics = cache.createSamplingStatisticsDocuments('12345678901234567890abcd');
+    const statistics = cache.createSamplingStatisticsDocuments(
+      '12345678901234567890abcd'
+    );
 
     // 1 ms should not be big enough to expect a timestamp difference
     expect(statistics).toEqual([

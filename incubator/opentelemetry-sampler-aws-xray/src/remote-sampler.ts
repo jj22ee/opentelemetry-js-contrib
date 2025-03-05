@@ -14,8 +14,19 @@
  * limitations under the License.
  */
 
-import { Attributes, Context, DiagLogger, Link, SpanKind, diag } from '@opentelemetry/api';
-import { ParentBasedSampler, Sampler, SamplingResult } from '@opentelemetry/sdk-trace-base';
+import {
+  Attributes,
+  Context,
+  DiagLogger,
+  Link,
+  SpanKind,
+  diag,
+} from '@opentelemetry/api';
+import {
+  ParentBasedSampler,
+  Sampler,
+  SamplingResult,
+} from '@opentelemetry/sdk-trace-base';
 import { AwsXraySamplingClient } from './aws-xray-sampling-client';
 import { FallbackSampler } from './fallback-sampler';
 import {
@@ -27,20 +38,25 @@ import {
   SamplingTargetDocument,
   TargetMap,
 } from './remote-sampler.types';
-import { DEFAULT_TARGET_POLLING_INTERVAL_SECONDS, RuleCache } from './rule-cache';
+import {
+  DEFAULT_TARGET_POLLING_INTERVAL_SECONDS,
+  RuleCache,
+} from './rule-cache';
 import { SamplingRuleApplier } from './sampling-rule-applier';
 
 // 5 minute default sampling rules polling interval
 const DEFAULT_RULES_POLLING_INTERVAL_SECONDS: number = 5 * 60;
 // Default endpoint for awsproxy : https://aws-otel.github.io/docs/getting-started/remote-sampling#enable-awsproxy-extension
-const DEFAULT_AWS_PROXY_ENDPOINT: string = 'http://localhost:2000';
+const DEFAULT_AWS_PROXY_ENDPOINT = 'http://localhost:2000';
 
 // Wrapper class to ensure that all XRay Sampler Functionality in _AwsXRayRemoteSampler
 // uses ParentBased logic to respect the parent span's sampling decision
 export class AwsXRayRemoteSampler implements Sampler {
   private _root: ParentBasedSampler;
   constructor(samplerConfig: AWSXRayRemoteSamplerConfig) {
-    this._root = new ParentBasedSampler({ root: new _AwsXRayRemoteSampler(samplerConfig) });
+    this._root = new ParentBasedSampler({
+      root: new _AwsXRayRemoteSampler(samplerConfig),
+    });
   }
   public shouldSample(
     context: Context,
@@ -50,7 +66,14 @@ export class AwsXRayRemoteSampler implements Sampler {
     attributes: Attributes,
     links: Link[]
   ): SamplingResult {
-    return this._root.shouldSample(context, traceId, spanName, spanKind, attributes, links);
+    return this._root.shouldSample(
+      context,
+      traceId,
+      spanName,
+      spanKind,
+      attributes,
+      links
+    );
   }
 
   public toString(): string {
@@ -78,11 +101,15 @@ export class _AwsXRayRemoteSampler implements Sampler {
   constructor(samplerConfig: AWSXRayRemoteSamplerConfig) {
     this.samplerDiag = diag;
 
-    if (samplerConfig.pollingInterval == null || samplerConfig.pollingInterval < 10) {
+    if (
+      samplerConfig.pollingInterval == null ||
+      samplerConfig.pollingInterval < 10
+    ) {
       this.samplerDiag.warn(
         `'pollingInterval' is undefined or too small. Defaulting to ${DEFAULT_RULES_POLLING_INTERVAL_SECONDS} seconds`
       );
-      this.rulePollingIntervalMillis = DEFAULT_RULES_POLLING_INTERVAL_SECONDS * 1000;
+      this.rulePollingIntervalMillis =
+        DEFAULT_RULES_POLLING_INTERVAL_SECONDS * 1000;
     } else {
       this.rulePollingIntervalMillis = samplerConfig.pollingInterval * 1000;
     }
@@ -91,12 +118,17 @@ export class _AwsXRayRemoteSampler implements Sampler {
     this.targetPollingInterval = this.getDefaultTargetPollingInterval();
     this.targetPollingJitterMillis = (Math.random() / 10) * 1000;
 
-    this.awsProxyEndpoint = samplerConfig.endpoint ? samplerConfig.endpoint : DEFAULT_AWS_PROXY_ENDPOINT;
+    this.awsProxyEndpoint = samplerConfig.endpoint
+      ? samplerConfig.endpoint
+      : DEFAULT_AWS_PROXY_ENDPOINT;
     this.fallbackSampler = new FallbackSampler();
     this.clientId = _AwsXRayRemoteSampler.generateClientId();
     this.ruleCache = new RuleCache(samplerConfig.resource);
 
-    this.samplingClient = new AwsXraySamplingClient(this.awsProxyEndpoint, this.samplerDiag);
+    this.samplingClient = new AwsXraySamplingClient(
+      this.awsProxyEndpoint,
+      this.samplerDiag
+    );
 
     // Start the Sampling Rules poller
     this.startSamplingRulesPoller();
@@ -118,19 +150,43 @@ export class _AwsXRayRemoteSampler implements Sampler {
     links: Link[]
   ): SamplingResult {
     if (this.ruleCache.isExpired()) {
-      this.samplerDiag.debug('Rule cache is expired, so using fallback sampling strategy');
-      return this.fallbackSampler.shouldSample(context, traceId, spanName, spanKind, attributes, links);
+      this.samplerDiag.debug(
+        'Rule cache is expired, so using fallback sampling strategy'
+      );
+      return this.fallbackSampler.shouldSample(
+        context,
+        traceId,
+        spanName,
+        spanKind,
+        attributes,
+        links
+      );
     }
 
-    const matchedRule: SamplingRuleApplier | undefined = this.ruleCache.getMatchedRule(attributes);
+    const matchedRule: SamplingRuleApplier | undefined =
+      this.ruleCache.getMatchedRule(attributes);
     if (matchedRule) {
-      return matchedRule.shouldSample(context, traceId, spanName, spanKind, attributes, links);
+      return matchedRule.shouldSample(
+        context,
+        traceId,
+        spanName,
+        spanKind,
+        attributes,
+        links
+      );
     }
 
     this.samplerDiag.debug(
       'Using fallback sampler as no rule match was found. This is likely due to a bug, since default rule should always match'
     );
-    return this.fallbackSampler.shouldSample(context, traceId, spanName, spanKind, attributes, links);
+    return this.fallbackSampler.shouldSample(
+      context,
+      traceId,
+      spanName,
+      spanKind,
+      attributes,
+      links
+    );
   }
 
   public toString(): string {
@@ -161,10 +217,14 @@ export class _AwsXRayRemoteSampler implements Sampler {
 
   private getAndUpdateSamplingTargets(): void {
     const requestBody: GetSamplingTargetsBody = {
-      SamplingStatisticsDocuments: this.ruleCache.createSamplingStatisticsDocuments(this.clientId),
+      SamplingStatisticsDocuments:
+        this.ruleCache.createSamplingStatisticsDocuments(this.clientId),
     };
 
-    this.samplingClient.fetchSamplingTargets(requestBody, this.updateSamplingTargets.bind(this));
+    this.samplingClient.fetchSamplingTargets(
+      requestBody,
+      this.updateSamplingTargets.bind(this)
+    );
   }
 
   private getAndUpdateSamplingRules(): void {
@@ -176,37 +236,50 @@ export class _AwsXRayRemoteSampler implements Sampler {
 
     samplingRules = [];
     if (responseObject.SamplingRuleRecords) {
-      responseObject.SamplingRuleRecords.forEach((record: SamplingRuleRecord) => {
-        if (record.SamplingRule) {
-          samplingRules.push(new SamplingRuleApplier(record.SamplingRule, undefined));
+      responseObject.SamplingRuleRecords.forEach(
+        (record: SamplingRuleRecord) => {
+          if (record.SamplingRule) {
+            samplingRules.push(
+              new SamplingRuleApplier(record.SamplingRule, undefined)
+            );
+          }
         }
-      });
+      );
       this.ruleCache.updateRules(samplingRules);
     } else {
-      this.samplerDiag.error('SamplingRuleRecords from GetSamplingRules request is not defined');
+      this.samplerDiag.error(
+        'SamplingRuleRecords from GetSamplingRules request is not defined'
+      );
     }
   }
 
-  private updateSamplingTargets(responseObject: GetSamplingTargetsResponse): void {
+  private updateSamplingTargets(
+    responseObject: GetSamplingTargetsResponse
+  ): void {
     try {
       const targetDocuments: TargetMap = {};
 
       // Create Target-Name-to-Target-Map from sampling targets response
-      responseObject.SamplingTargetDocuments.forEach((newTarget: SamplingTargetDocument) => {
-        targetDocuments[newTarget.RuleName] = newTarget;
-      });
+      responseObject.SamplingTargetDocuments.forEach(
+        (newTarget: SamplingTargetDocument) => {
+          targetDocuments[newTarget.RuleName] = newTarget;
+        }
+      );
 
       // Update targets in the cache
-      const [refreshSamplingRules, nextPollingInterval]: [boolean, number] = this.ruleCache.updateTargets(
-        targetDocuments,
-        responseObject.LastRuleModification
-      );
+      const [refreshSamplingRules, nextPollingInterval]: [boolean, number] =
+        this.ruleCache.updateTargets(
+          targetDocuments,
+          responseObject.LastRuleModification
+        );
       this.targetPollingInterval = nextPollingInterval;
       clearInterval(this.targetPoller);
       this.startSamplingTargetsPoller();
 
       if (refreshSamplingRules) {
-        this.samplerDiag.debug('Performing out-of-band sampling rule polling to fetch updated rules.');
+        this.samplerDiag.debug(
+          'Performing out-of-band sampling rule polling to fetch updated rules.'
+        );
         clearInterval(this.rulePoller);
         this.startSamplingRulesPoller();
       }
@@ -216,9 +289,26 @@ export class _AwsXRayRemoteSampler implements Sampler {
   }
 
   private static generateClientId(): string {
-    const hexChars: string[] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
+    const hexChars: string[] = [
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      'a',
+      'b',
+      'c',
+      'd',
+      'e',
+      'f',
+    ];
     const clientIdArray: string[] = [];
-    for (let _: number = 0; _ < 24; _ += 1) {
+    for (let _ = 0; _ < 24; _ += 1) {
       clientIdArray.push(hexChars[Math.floor(Math.random() * hexChars.length)]);
     }
     return clientIdArray.join('');

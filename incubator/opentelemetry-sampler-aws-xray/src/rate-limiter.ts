@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 /*
  * The RateLimiter keeps track of the current reservoir quota balance available (measured via available time)
  * If enough time has elapsed, the RateLimiter will allow quota balance to be consumed/taken (decrease available time)
@@ -27,14 +26,14 @@ export class RateLimiter {
   // Used to measure current quota balance.
   private walletFloorMillis: number;
 
-  constructor(quota: number, maxBalanceInSeconds: number = 1) {
+  constructor(quota: number, maxBalanceInSeconds = 1) {
     this.MAX_BALANCE_MILLIS = maxBalanceInSeconds * 1000.0;
     this.quota = quota;
     this.walletFloorMillis = Date.now();
     // current "balance" would be `ceiling - floor`
   }
 
-  public take(cost: number = 1): boolean {
+  public take(cost = 1): boolean {
     if (this.quota === 0) {
       return false;
     }
@@ -45,11 +44,17 @@ export class RateLimiter {
     const costInMillis: number = cost / quotaPerMillis;
 
     const walletCeilingMillis: number = Date.now();
-    let currentBalanceMillis: number = walletCeilingMillis - this.walletFloorMillis;
-    currentBalanceMillis = Math.min(currentBalanceMillis, this.MAX_BALANCE_MILLIS);
-    const pendingRemainingBalanceMillis: number = currentBalanceMillis - costInMillis;
+    let currentBalanceMillis: number =
+      walletCeilingMillis - this.walletFloorMillis;
+    currentBalanceMillis = Math.min(
+      currentBalanceMillis,
+      this.MAX_BALANCE_MILLIS
+    );
+    const pendingRemainingBalanceMillis: number =
+      currentBalanceMillis - costInMillis;
     if (pendingRemainingBalanceMillis >= 0) {
-      this.walletFloorMillis = walletCeilingMillis - pendingRemainingBalanceMillis;
+      this.walletFloorMillis =
+        walletCeilingMillis - pendingRemainingBalanceMillis;
       return true;
     }
     // No changes to the wallet state

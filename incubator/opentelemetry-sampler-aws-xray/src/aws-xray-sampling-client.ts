@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-
 import { DiagLogFunction, DiagLogger, context } from '@opentelemetry/api';
 import { suppressTracing } from '@opentelemetry/core';
 import * as http from 'http';
-import { GetSamplingRulesResponse, GetSamplingTargetsBody, GetSamplingTargetsResponse } from './remote-sampler.types';
+import {
+  GetSamplingRulesResponse,
+  GetSamplingTargetsBody,
+  GetSamplingTargetsResponse,
+} from './remote-sampler.types';
 
 export class AwsXraySamplingClient {
   private getSamplingRulesEndpoint: string;
@@ -43,8 +46,14 @@ export class AwsXraySamplingClient {
     );
   }
 
-  public fetchSamplingRules(callback: (responseObject: GetSamplingRulesResponse) => void) {
-    this.makeSamplingRequest<GetSamplingRulesResponse>(this.getSamplingRulesEndpoint, callback, this.samplerDiag.error);
+  public fetchSamplingRules(
+    callback: (responseObject: GetSamplingRulesResponse) => void
+  ) {
+    this.makeSamplingRequest<GetSamplingRulesResponse>(
+      this.getSamplingRulesEndpoint,
+      callback,
+      this.samplerDiag.error
+    );
   }
 
   private makeSamplingRequest<T>(
@@ -70,7 +79,7 @@ export class AwsXraySamplingClient {
       const req: http.ClientRequest = http
         .request(url, options, response => {
           response.setEncoding('utf-8');
-          let responseData: string = '';
+          let responseData = '';
           response.on('data', dataChunk => (responseData += dataChunk));
           response.on('end', () => {
             if (response.statusCode === 200 && responseData.length > 0) {
@@ -85,7 +94,9 @@ export class AwsXraySamplingClient {
                 callback(responseObject);
               }
             } else {
-              this.samplerDiag.debug(`${url} Response Code is: ${response.statusCode}`);
+              this.samplerDiag.debug(
+                `${url} Response Code is: ${response.statusCode}`
+              );
               this.samplerDiag.debug(`${url} responseData is: ${responseData}`);
             }
           });

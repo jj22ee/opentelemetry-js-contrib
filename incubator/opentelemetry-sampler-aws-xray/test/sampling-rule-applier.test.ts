@@ -33,7 +33,8 @@ const DATA_DIR = __dirname + '/data';
 
 describe('SamplingRuleApplier', () => {
   it('testApplierAttributeMatchingFromXRayResponse', () => {
-    const sampleData = require(DATA_DIR + '/get-sampling-rules-response-sample-2.json');
+    const sampleData = require(DATA_DIR +
+      '/get-sampling-rules-response-sample-2.json');
 
     const allRules = sampleData['SamplingRuleRecords'];
     const defaultRule: SamplingRule = allRules[0]['SamplingRule'];
@@ -78,7 +79,8 @@ describe('SamplingRuleApplier', () => {
     const attributes: Attributes = {
       [SEMATTRS_HTTP_HOST]: 'localhost',
       [SEMATTRS_HTTP_METHOD]: 'GET',
-      [SEMATTRS_AWS_LAMBDA_INVOKED_ARN]: 'arn:aws:lambda:us-west-2:123456789012:function:my-function',
+      [SEMATTRS_AWS_LAMBDA_INVOKED_ARN]:
+        'arn:aws:lambda:us-west-2:123456789012:function:my-function',
       [SEMATTRS_HTTP_URL]: 'http://127.0.0.1:5000/helloworld',
       ['abc']: '123',
       ['def']: '456',

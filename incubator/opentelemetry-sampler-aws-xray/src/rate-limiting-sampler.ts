@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-
 import { Attributes, Context, Link, SpanKind } from '@opentelemetry/api';
-import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/sdk-trace-base';
+import {
+  Sampler,
+  SamplingDecision,
+  SamplingResult,
+} from '@opentelemetry/sdk-trace-base';
 import { RateLimiter } from './rate-limiter';
 
 export class RateLimitingSampler implements Sampler {
@@ -37,7 +40,10 @@ export class RateLimitingSampler implements Sampler {
     links: Link[]
   ): SamplingResult {
     if (this.reservoir.take(1)) {
-      return { decision: SamplingDecision.RECORD_AND_SAMPLED, attributes: attributes };
+      return {
+        decision: SamplingDecision.RECORD_AND_SAMPLED,
+        attributes: attributes,
+      };
     }
     return { decision: SamplingDecision.NOT_RECORD, attributes: attributes };
   }

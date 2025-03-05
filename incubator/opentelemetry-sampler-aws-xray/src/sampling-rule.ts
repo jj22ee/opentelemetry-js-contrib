@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import { ISamplingRule } from './remote-sampler.types';
 
 export class SamplingRule implements ISamplingRule {
@@ -59,7 +58,10 @@ export class SamplingRule implements ISamplingRule {
     } else {
       attributesEquals = this.Attributes.length === other.Attributes.length;
       for (const attributeKey in other.Attributes) {
-        if (!(attributeKey in this.Attributes) || this.Attributes[attributeKey] !== other.Attributes[attributeKey]) {
+        if (
+          !(attributeKey in this.Attributes) ||
+          this.Attributes[attributeKey] !== other.Attributes[attributeKey]
+        ) {
           attributesEquals = false;
           break;
         }

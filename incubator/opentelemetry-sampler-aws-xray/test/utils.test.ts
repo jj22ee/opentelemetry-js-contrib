@@ -35,7 +35,10 @@ const positiveTests: any = [
   ['a*a', 'aa'],
   ['a*a', 'aba'],
   ['a*a*', 'aaaaaaaaaaaaaaaaaaaaaaa'],
-  ['a*b*a*b*a*b*a*b*a*', 'akljd9gsdfbkjhaabajkhbbyiaahkjbjhbuykjakjhabkjhbabjhkaabbabbaaakljdfsjklababkjbsdabab'],
+  [
+    'a*b*a*b*a*b*a*b*a*',
+    'akljd9gsdfbkjhaabajkhbbyiaahkjbjhbuykjakjhabkjhbabjhkaabbabbaaakljdfsjklababkjbsdabab',
+  ],
   ['a*na*ha', 'anananahahanahanaha'],
   ['***a', 'a'],
   ['**a**', 'a'],
@@ -110,10 +113,17 @@ describe('SamplingUtils', () => {
       const ruleAttributes = { string: 'string', string2: 'string2' };
       expect(Utils.attributeMatch(undefined, ruleAttributes)).toEqual(false);
       expect(Utils.attributeMatch({}, ruleAttributes)).toEqual(false);
-      expect(Utils.attributeMatch({ string: 'string' }, ruleAttributes)).toEqual(false);
+      expect(
+        Utils.attributeMatch({ string: 'string' }, ruleAttributes)
+      ).toEqual(false);
     });
     it('testUndefinedRuleAttributes', () => {
-      const attr = { number: 1, string: 'string', undefined: undefined, boolean: true };
+      const attr = {
+        number: 1,
+        string: 'string',
+        undefined: undefined,
+        boolean: true,
+      };
 
       expect(Utils.attributeMatch(attr, undefined)).toEqual(true);
     });
@@ -130,13 +140,23 @@ describe('SamplingUtils', () => {
       expect(Utils.attributeMatch(attr, ruleAttribute)).toEqual(false);
     });
     it('testExtraAttributesSuccess', () => {
-      const attr = { number: 1, string: 'string', undefined: undefined, boolean: true };
+      const attr = {
+        number: 1,
+        string: 'string',
+        undefined: undefined,
+        boolean: true,
+      };
       const ruleAttribute = { string: 'string' };
 
       expect(Utils.attributeMatch(attr, ruleAttribute)).toEqual(true);
     });
     it('testExtraAttributesSuccess', () => {
-      const attr = { number: 1, string: 'string', undefined: undefined, boolean: true };
+      const attr = {
+        number: 1,
+        string: 'string',
+        undefined: undefined,
+        boolean: true,
+      };
       const ruleAttribute = { string: 'string', number: '1' };
 
       expect(Utils.attributeMatch(attr, ruleAttribute)).toEqual(false);

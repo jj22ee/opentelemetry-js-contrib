@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import { Attributes, diag } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import {
@@ -29,7 +28,7 @@ import { SamplingRuleApplier } from './sampling-rule-applier';
 const RULE_CACHE_TTL_MILLIS: number = 60 * 60 * 1000;
 
 // 10 second default sampling targets polling interval
-export const DEFAULT_TARGET_POLLING_INTERVAL_SECONDS: number = 10;
+export const DEFAULT_TARGET_POLLING_INTERVAL_SECONDS = 10;
 
 export class RuleCache {
   private ruleAppliers: SamplingRuleApplier[];
@@ -47,19 +46,27 @@ export class RuleCache {
     return nowInMillis > this.lastUpdatedEpochMillis + RULE_CACHE_TTL_MILLIS;
   }
 
-  public getMatchedRule(attributes: Attributes): SamplingRuleApplier | undefined {
+  public getMatchedRule(
+    attributes: Attributes
+  ): SamplingRuleApplier | undefined {
     return this.ruleAppliers.find(
-      rule => rule.matches(attributes, this.samplerResource) || rule.samplingRule.RuleName === 'Default'
+      rule =>
+        rule.matches(attributes, this.samplerResource) ||
+        rule.samplingRule.RuleName === 'Default'
     );
   }
 
   private sortRulesByPriority(): void {
-    this.ruleAppliers.sort((rule1: SamplingRuleApplier, rule2: SamplingRuleApplier): number => {
-      if (rule1.samplingRule.Priority === rule2.samplingRule.Priority) {
-        return rule1.samplingRule.RuleName < rule2.samplingRule.RuleName ? -1 : 1;
+    this.ruleAppliers.sort(
+      (rule1: SamplingRuleApplier, rule2: SamplingRuleApplier): number => {
+        if (rule1.samplingRule.Priority === rule2.samplingRule.Priority) {
+          return rule1.samplingRule.RuleName < rule2.samplingRule.RuleName
+            ? -1
+            : 1;
+        }
+        return rule1.samplingRule.Priority - rule2.samplingRule.Priority;
       }
-      return rule1.samplingRule.Priority - rule2.samplingRule.Priority;
-    });
+    );
   }
 
   public updateRules(newRuleAppliers: SamplingRuleApplier[]): void {
@@ -72,7 +79,8 @@ export class RuleCache {
     newRuleAppliers.forEach((newRule: SamplingRuleApplier, index: number) => {
       const ruleNameToCheck: string = newRule.samplingRule.RuleName;
       if (ruleNameToCheck in oldRuleAppliersMap) {
-        const oldRule: SamplingRuleApplier = oldRuleAppliersMap[ruleNameToCheck];
+        const oldRule: SamplingRuleApplier =
+          oldRuleAppliersMap[ruleNameToCheck];
         if (newRule.samplingRule.equals(oldRule.samplingRule)) {
           newRuleAppliers[index] = oldRule;
         }
@@ -85,7 +93,9 @@ export class RuleCache {
     this.lastUpdatedEpochMillis = Date.now();
   }
 
-  public createSamplingStatisticsDocuments(clientId: string): SamplingStatisticsDocument[] {
+  public createSamplingStatisticsDocuments(
+    clientId: string
+  ): SamplingStatisticsDocument[] {
     const statisticsDocuments: SamplingStatisticsDocument[] = [];
 
     this.ruleAppliers.forEach((rule: SamplingRuleApplier) => {
@@ -107,15 +117,22 @@ export class RuleCache {
   }
 
   // Update ruleAppliers based on the targets fetched from X-Ray service
-  public updateTargets(targetDocuments: TargetMap, lastRuleModification: number): [boolean, number] {
+  public updateTargets(
+    targetDocuments: TargetMap,
+    lastRuleModification: number
+  ): [boolean, number] {
     let minPollingInteral: number | undefined = undefined;
     let nextPollingInterval: number = DEFAULT_TARGET_POLLING_INTERVAL_SECONDS;
     this.ruleAppliers.forEach((rule: SamplingRuleApplier, index: number) => {
-      const target: SamplingTargetDocument = targetDocuments[rule.samplingRule.RuleName];
+      const target: SamplingTargetDocument =
+        targetDocuments[rule.samplingRule.RuleName];
       if (target) {
         this.ruleAppliers[index] = rule.withTarget(target);
         if (target.Interval) {
-          if (minPollingInteral === undefined || minPollingInteral > target.Interval) {
+          if (
+            minPollingInteral === undefined ||
+            minPollingInteral > target.Interval
+          ) {
             minPollingInteral = target.Interval;
           }
         }
@@ -128,7 +145,8 @@ export class RuleCache {
       nextPollingInterval = minPollingInteral;
     }
 
-    const refreshSamplingRules: boolean = lastRuleModification * 1000 > this.lastUpdatedEpochMillis;
+    const refreshSamplingRules: boolean =
+      lastRuleModification * 1000 > this.lastUpdatedEpochMillis;
     return [refreshSamplingRules, nextPollingInterval];
   }
 }

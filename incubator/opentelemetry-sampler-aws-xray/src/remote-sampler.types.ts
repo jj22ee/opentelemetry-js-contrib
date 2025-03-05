@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import { Resource } from '@opentelemetry/resources';
 
 export interface AWSXRayRemoteSamplerConfig {
