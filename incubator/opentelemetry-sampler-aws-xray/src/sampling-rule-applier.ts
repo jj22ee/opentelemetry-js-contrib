@@ -33,19 +33,22 @@ import {
   ATTR_SERVER_ADDRESS,
   ATTR_URL_FULL,
   ATTR_URL_PATH,
-  CLOUDPLATFORMVALUES_AWS_LAMBDA,
-  SEMATTRS_AWS_LAMBDA_INVOKED_ARN,
-  SEMATTRS_HTTP_HOST,
-  SEMATTRS_HTTP_METHOD,
-  SEMATTRS_HTTP_TARGET,
-  SEMATTRS_HTTP_URL,
-  SEMRESATTRS_AWS_ECS_CLUSTER_ARN,
-  SEMRESATTRS_AWS_ECS_CONTAINER_ARN,
-  SEMRESATTRS_AWS_EKS_CLUSTER_ARN,
-  SEMRESATTRS_CLOUD_PLATFORM,
+  ATTR_SERVICE_NAME,
   SEMRESATTRS_FAAS_ID,
-  SEMRESATTRS_SERVICE_NAME,
 } from '@opentelemetry/semantic-conventions';
+import {
+  ATTR_HTTP_HOST,
+  ATTR_HTTP_METHOD,
+  ATTR_HTTP_URL,
+  ATTR_HTTP_TARGET,
+  ATTR_CLOUD_PLATFORM,
+  ATTR_AWS_ECS_CLUSTER_ARN,
+  ATTR_AWS_ECS_CONTAINER_ARN,
+  ATTR_AWS_EKS_CLUSTER_ARN,
+  CLOUD_PLATFORM_VALUE_AWS_LAMBDA,
+  ATTR_AWS_LAMBDA_INVOKED_ARN,
+  ATTR_CLOUD_RESOURCE_ID,
+} from './semconv';
 import { RateLimitingSampler } from './rate-limiting-sampler';
 import {
   ISamplingRule,
@@ -125,14 +128,12 @@ export class SamplingRuleApplier {
     let serviceName: AttributeValue | undefined = undefined;
 
     if (attributes) {
-      httpTarget =
-        attributes[SEMATTRS_HTTP_TARGET] ?? attributes[ATTR_URL_PATH];
-      httpUrl = attributes[SEMATTRS_HTTP_URL] ?? attributes[ATTR_URL_FULL];
+      httpTarget = attributes[ATTR_HTTP_TARGET] ?? attributes[ATTR_URL_PATH];
+      httpUrl = attributes[ATTR_HTTP_URL] ?? attributes[ATTR_URL_FULL];
       httpMethod =
-        attributes[SEMATTRS_HTTP_METHOD] ??
-        attributes[ATTR_HTTP_REQUEST_METHOD];
+        attributes[ATTR_HTTP_METHOD] ?? attributes[ATTR_HTTP_REQUEST_METHOD];
       httpHost =
-        attributes[SEMATTRS_HTTP_HOST] ??
+        attributes[ATTR_HTTP_HOST] ??
         attributes[ATTR_SERVER_ADDRESS] ??
         attributes[ATTR_CLIENT_ADDRESS];
     }
@@ -141,9 +142,9 @@ export class SamplingRuleApplier {
     let resourceARN: AttributeValue | undefined = undefined;
 
     if (resource) {
-      serviceName = resource.attributes[SEMRESATTRS_SERVICE_NAME] || '';
+      serviceName = resource.attributes[ATTR_SERVICE_NAME] || '';
       const cloudPlatform: AttributeValue | undefined =
-        resource.attributes[SEMRESATTRS_CLOUD_PLATFORM];
+        resource.attributes[ATTR_CLOUD_PLATFORM];
       if (typeof cloudPlatform === 'string') {
         serviceType = CLOUD_PLATFORM_MAPPING[cloudPlatform];
       }
@@ -229,14 +230,14 @@ export class SamplingRuleApplier {
     attributes: Attributes
   ): AttributeValue | undefined {
     let arn: AttributeValue | undefined =
-      resource.attributes[SEMRESATTRS_AWS_ECS_CONTAINER_ARN] ||
-      resource.attributes[SEMRESATTRS_AWS_ECS_CLUSTER_ARN] ||
-      resource.attributes[SEMRESATTRS_AWS_EKS_CLUSTER_ARN];
+      resource.attributes[ATTR_AWS_ECS_CONTAINER_ARN] ||
+      resource.attributes[ATTR_AWS_ECS_CLUSTER_ARN] ||
+      resource.attributes[ATTR_AWS_EKS_CLUSTER_ARN];
 
     if (
       arn === undefined &&
-      resource?.attributes[SEMRESATTRS_CLOUD_PLATFORM] ===
-        CLOUDPLATFORMVALUES_AWS_LAMBDA
+      resource?.attributes[ATTR_CLOUD_PLATFORM] ===
+        CLOUD_PLATFORM_VALUE_AWS_LAMBDA
     ) {
       arn = this.getLambdaArn(resource, attributes);
     }
@@ -248,8 +249,9 @@ export class SamplingRuleApplier {
     attributes: Attributes
   ): AttributeValue | undefined {
     const arn: AttributeValue | undefined =
+      resource?.attributes[ATTR_CLOUD_RESOURCE_ID] ||
       resource?.attributes[SEMRESATTRS_FAAS_ID] ||
-      attributes[SEMATTRS_AWS_LAMBDA_INVOKED_ARN];
+      attributes[ATTR_AWS_LAMBDA_INVOKED_ARN];
     return arn;
   }
 }

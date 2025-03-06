@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api/build/src/common/Attributes';
+import { Attributes } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import {
-  SEMATTRS_AWS_LAMBDA_INVOKED_ARN,
-  SEMATTRS_HTTP_HOST,
-  SEMATTRS_HTTP_METHOD,
-  SEMATTRS_HTTP_TARGET,
-  SEMATTRS_HTTP_URL,
-  SEMRESATTRS_CLOUD_PLATFORM,
-  SEMRESATTRS_SERVICE_NAME,
-} from '@opentelemetry/semantic-conventions';
+  ATTR_AWS_LAMBDA_INVOKED_ARN,
+  ATTR_HTTP_HOST,
+  ATTR_HTTP_METHOD,
+  ATTR_HTTP_TARGET,
+  ATTR_HTTP_URL,
+  ATTR_CLOUD_PLATFORM,
+} from './../src/semconv';
+
 import { expect } from 'expect';
 import { SamplingRule } from '../src/sampling-rule';
 import { SamplingRuleApplier } from '../src/sampling-rule-applier';
@@ -41,15 +42,15 @@ describe('SamplingRuleApplier', () => {
     const samplingRuleApplier = new SamplingRuleApplier(defaultRule);
 
     const resource = new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: 'test_service_name',
-      [SEMRESATTRS_CLOUD_PLATFORM]: 'test_cloud_platform',
+      [ATTR_SERVICE_NAME]: 'test_service_name',
+      [ATTR_CLOUD_PLATFORM]: 'test_cloud_platform',
     });
 
     const attr: Attributes = {
-      [SEMATTRS_HTTP_TARGET]: '/target',
-      [SEMATTRS_HTTP_METHOD]: 'method',
-      [SEMATTRS_HTTP_URL]: 'url',
-      [SEMATTRS_HTTP_HOST]: 'host',
+      [ATTR_HTTP_TARGET]: '/target',
+      [ATTR_HTTP_METHOD]: 'method',
+      [ATTR_HTTP_URL]: 'url',
+      [ATTR_HTTP_HOST]: 'host',
       ['foo']: 'bar',
       ['abc']: '1234',
     };
@@ -77,26 +78,26 @@ describe('SamplingRuleApplier', () => {
     });
 
     const attributes: Attributes = {
-      [SEMATTRS_HTTP_HOST]: 'localhost',
-      [SEMATTRS_HTTP_METHOD]: 'GET',
-      [SEMATTRS_AWS_LAMBDA_INVOKED_ARN]:
+      [ATTR_HTTP_HOST]: 'localhost',
+      [ATTR_HTTP_METHOD]: 'GET',
+      [ATTR_AWS_LAMBDA_INVOKED_ARN]:
         'arn:aws:lambda:us-west-2:123456789012:function:my-function',
-      [SEMATTRS_HTTP_URL]: 'http://127.0.0.1:5000/helloworld',
+      [ATTR_HTTP_URL]: 'http://127.0.0.1:5000/helloworld',
       ['abc']: '123',
       ['def']: '456',
       ['ghi']: '789',
     };
 
     const resource = new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: 'myServiceName',
-      [SEMRESATTRS_CLOUD_PLATFORM]: 'aws_lambda',
+      [ATTR_SERVICE_NAME]: 'myServiceName',
+      [ATTR_CLOUD_PLATFORM]: 'aws_lambda',
     });
 
     const ruleApplier = new SamplingRuleApplier(rule);
 
     expect(ruleApplier.matches(attributes, resource)).toEqual(true);
-    delete attributes[SEMATTRS_HTTP_URL];
-    attributes[SEMATTRS_HTTP_TARGET] = '/helloworld';
+    delete attributes[ATTR_HTTP_URL];
+    attributes[ATTR_HTTP_TARGET] = '/helloworld';
     expect(ruleApplier.matches(attributes, resource)).toEqual(true);
   });
   it('testApplierWildCardAttributesMatchesSpanAttributes', () => {
@@ -162,9 +163,9 @@ describe('SamplingRuleApplier', () => {
     );
 
     const attributes: Attributes = {
-      [SEMATTRS_HTTP_HOST]: 'localhost',
-      [SEMATTRS_HTTP_METHOD]: 'GET',
-      [SEMATTRS_HTTP_URL]: 'http://127.0.0.1:5000/helloworld',
+      [ATTR_HTTP_HOST]: 'localhost',
+      [ATTR_HTTP_METHOD]: 'GET',
+      [ATTR_HTTP_URL]: 'http://127.0.0.1:5000/helloworld',
     };
 
     expect(ruleApplier.matches(attributes, Resource.EMPTY)).toEqual(true);
@@ -191,8 +192,8 @@ describe('SamplingRuleApplier', () => {
 
     const attributes: Attributes = {};
     const resource = new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: 'myServiceName',
-      [SEMRESATTRS_CLOUD_PLATFORM]: 'aws_ec2',
+      [ATTR_SERVICE_NAME]: 'myServiceName',
+      [ATTR_CLOUD_PLATFORM]: 'aws_ec2',
     });
 
     expect(ruleApplier.matches(attributes, resource)).toEqual(true);
@@ -223,7 +224,7 @@ describe('SamplingRuleApplier', () => {
     );
 
     const attributes: Attributes = {
-      [SEMATTRS_HTTP_URL]: 'https://somerandomurl.com/somerandompath',
+      [ATTR_HTTP_URL]: 'https://somerandomurl.com/somerandompath',
     };
     const resource = new Resource({});
 

@@ -16,20 +16,20 @@
 
 import { AttributeValue, Attributes, diag } from '@opentelemetry/api';
 import {
-  CLOUDPLATFORMVALUES_AWS_EC2,
-  CLOUDPLATFORMVALUES_AWS_ECS,
-  CLOUDPLATFORMVALUES_AWS_EKS,
-  CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK,
-  CLOUDPLATFORMVALUES_AWS_LAMBDA,
-} from '@opentelemetry/semantic-conventions';
+  CLOUD_PLATFORM_VALUE_AWS_EC2,
+  CLOUD_PLATFORM_VALUE_AWS_ECS,
+  CLOUD_PLATFORM_VALUE_AWS_EKS,
+  CLOUD_PLATFORM_VALUE_AWS_ELASTIC_BEANSTALK,
+  CLOUD_PLATFORM_VALUE_AWS_LAMBDA,
+} from './semconv';
 
 export const CLOUD_PLATFORM_MAPPING: { [cloudPlatformKey: string]: string } = {
-  [CLOUDPLATFORMVALUES_AWS_LAMBDA]: 'AWS::Lambda::Function',
-  [CLOUDPLATFORMVALUES_AWS_ELASTIC_BEANSTALK]:
+  [CLOUD_PLATFORM_VALUE_AWS_LAMBDA]: 'AWS::Lambda::Function',
+  [CLOUD_PLATFORM_VALUE_AWS_ELASTIC_BEANSTALK]:
     'AWS::ElasticBeanstalk::Environment',
-  [CLOUDPLATFORMVALUES_AWS_EC2]: 'AWS::EC2::Instance',
-  [CLOUDPLATFORMVALUES_AWS_ECS]: 'AWS::ECS::Container',
-  [CLOUDPLATFORMVALUES_AWS_EKS]: 'AWS::EKS::Container',
+  [CLOUD_PLATFORM_VALUE_AWS_EC2]: 'AWS::EC2::Instance',
+  [CLOUD_PLATFORM_VALUE_AWS_ECS]: 'AWS::ECS::Container',
+  [CLOUD_PLATFORM_VALUE_AWS_EKS]: 'AWS::EKS::Container',
 };
 
 // Template function from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions#escaping

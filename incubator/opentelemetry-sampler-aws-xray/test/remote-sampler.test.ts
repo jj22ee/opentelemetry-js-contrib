@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 
-import {
-  context,
-  diag,
-  DiagConsoleLogger,
-  Span,
-  SpanKind,
-  trace,
-} from '@opentelemetry/api';
+import { context, Span, SpanKind, trace } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
-import * as opentelemetry from '@opentelemetry/sdk-node';
 import { SamplingDecision, Tracer } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   SEMRESATTRS_CLOUD_PLATFORM,
-  SEMRESATTRS_SERVICE_NAME,
+  ATTR_SERVICE_NAME,
 } from '@opentelemetry/semantic-conventions';
 import { expect } from 'expect';
 import * as nock from 'nock';
@@ -43,11 +35,6 @@ const DATA_DIR_SAMPLING_RULES =
 const DATA_DIR_SAMPLING_TARGETS =
   __dirname + '/data/test-remote-sampler_sampling-targets-response-sample.json';
 const TEST_URL = 'http://localhost:2000';
-
-diag.setLogger(
-  new DiagConsoleLogger(),
-  opentelemetry.core.getEnv().OTEL_LOG_LEVEL
-);
 
 describe('AwsXrayRemoteSampler', () => {
   it('testCreateRemoteSamplerWithEmptyResource', () => {
@@ -66,7 +53,7 @@ describe('AwsXrayRemoteSampler', () => {
 
   it('testCreateRemoteSamplerWithPopulatedResource', () => {
     const resource = new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: 'test-service-name',
+      [ATTR_SERVICE_NAME]: 'test-service-name',
       [SEMRESATTRS_CLOUD_PLATFORM]: 'test-cloud-platform',
     });
     const sampler = new AwsXRayRemoteSampler({ resource: resource });
@@ -85,7 +72,7 @@ describe('AwsXrayRemoteSampler', () => {
 
   it('testCreateRemoteSamplerWithAllFieldsPopulated', () => {
     const resource = new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: 'test-service-name',
+      [ATTR_SERVICE_NAME]: 'test-service-name',
       [SEMRESATTRS_CLOUD_PLATFORM]: 'test-cloud-platform',
     });
     const sampler = new AwsXRayRemoteSampler({
@@ -117,7 +104,7 @@ describe('AwsXrayRemoteSampler', () => {
       .post('/SamplingTargets')
       .reply(200, require(DATA_DIR_SAMPLING_TARGETS));
     const resource = new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: 'test-service-name',
+      [ATTR_SERVICE_NAME]: 'test-service-name',
       [SEMRESATTRS_CLOUD_PLATFORM]: 'test-cloud-platform',
     });
 
@@ -188,7 +175,7 @@ describe('AwsXrayRemoteSampler', () => {
       .post('/SamplingTargets')
       .reply(200, require(DATA_DIR_SAMPLING_TARGETS));
     const resource = new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: 'test-service-name',
+      [ATTR_SERVICE_NAME]: 'test-service-name',
       [SEMRESATTRS_CLOUD_PLATFORM]: 'test-cloud-platform',
     });
     const attributes = { abc: '1234' };
@@ -253,7 +240,7 @@ describe('AwsXrayRemoteSampler', () => {
       .post('/SamplingTargets')
       .reply(200, require(DATA_DIR_SAMPLING_TARGETS));
     const resource = new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: 'test-service-name',
+      [ATTR_SERVICE_NAME]: 'test-service-name',
       [SEMRESATTRS_CLOUD_PLATFORM]: 'test-cloud-platform',
     });
     const attributes = {
