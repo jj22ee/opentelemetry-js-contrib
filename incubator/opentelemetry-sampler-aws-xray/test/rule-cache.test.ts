@@ -55,7 +55,7 @@ describe('RuleCache', () => {
     cache.updateRules([defaultRule]);
 
     // Expect default rule to exist
-    expect((cache as any).ruleAppliers.length).toEqual(1);
+    expect(cache['ruleAppliers'].length).toEqual(1);
 
     // Set up incoming rules
     const rule1 = createRule('low', 200, 0, 0.0);
@@ -69,15 +69,15 @@ describe('RuleCache', () => {
     cache.updateRules(rules);
 
     // Default rule should be removed because it doesn't exist in the new list
-    expect((cache as any).ruleAppliers.length).toEqual(rules.length);
-    expect((cache as any).ruleAppliers[0].samplingRule.RuleName).toEqual(
+    expect(cache['ruleAppliers'].length).toEqual(rules.length);
+    expect(cache['ruleAppliers'][0].samplingRule.RuleName).toEqual(
       'high'
     );
-    expect((cache as any).ruleAppliers[1].samplingRule.RuleName).toEqual('A');
-    expect((cache as any).ruleAppliers[2].samplingRule.RuleName).toEqual('Abc');
-    expect((cache as any).ruleAppliers[3].samplingRule.RuleName).toEqual('ab');
-    expect((cache as any).ruleAppliers[4].samplingRule.RuleName).toEqual('abc');
-    expect((cache as any).ruleAppliers[5].samplingRule.RuleName).toEqual('low');
+    expect(cache['ruleAppliers'][1].samplingRule.RuleName).toEqual('A');
+    expect(cache['ruleAppliers'][2].samplingRule.RuleName).toEqual('Abc');
+    expect(cache['ruleAppliers'][3].samplingRule.RuleName).toEqual('ab');
+    expect(cache['ruleAppliers'][4].samplingRule.RuleName).toEqual('abc');
+    expect(cache['ruleAppliers'][5].samplingRule.RuleName).toEqual('low');
   });
 
   it('testRuleCacheExpirationLogic', () => {
@@ -103,48 +103,48 @@ describe('RuleCache', () => {
 
     cache.updateRules(ruleAppliers);
 
-    const ruleAppliersCopy = (cache as any).ruleAppliers;
+    const ruleAppliersCopy = cache['ruleAppliers'];
 
     const newRule3 = createRule('new_rule_3', 5, 0, 0.0);
     const newRuleAppliers = [rule1, rule2, newRule3];
     cache.updateRules(newRuleAppliers);
 
     // Check rule cache is still correct length and has correct rules
-    expect((cache as any).ruleAppliers.length).toEqual(3);
-    expect((cache as any).ruleAppliers[0].samplingRule.RuleName).toEqual(
+    expect(cache['ruleAppliers'].length).toEqual(3);
+    expect(cache['ruleAppliers'][0].samplingRule.RuleName).toEqual(
       'rule_1'
     );
-    expect((cache as any).ruleAppliers[1].samplingRule.RuleName).toEqual(
+    expect(cache['ruleAppliers'][1].samplingRule.RuleName).toEqual(
       'new_rule_3'
     );
-    expect((cache as any).ruleAppliers[2].samplingRule.RuleName).toEqual(
+    expect(cache['ruleAppliers'][2].samplingRule.RuleName).toEqual(
       'rule_2'
     );
 
     // Assert before and after of rule cache
-    expect(ruleAppliersCopy[0]).toEqual((cache as any).ruleAppliers[0]);
-    expect(ruleAppliersCopy[1]).toEqual((cache as any).ruleAppliers[2]);
-    expect(ruleAppliersCopy[2]).not.toEqual((cache as any).ruleAppliers[1]);
+    expect(ruleAppliersCopy[0]).toEqual(cache['ruleAppliers'][0]);
+    expect(ruleAppliersCopy[1]).toEqual(cache['ruleAppliers'][2]);
+    expect(ruleAppliersCopy[2]).not.toEqual(cache['ruleAppliers'][1]);
   });
 
   it('testUpdateRulesRemovesOlderRule', () => {
     // Set up default rule in rule cache
     const cache = new RuleCache(emptyResource());
-    expect((cache as any).ruleAppliers.length).toEqual(0);
+    expect(cache['ruleAppliers'].length).toEqual(0);
 
     const rule1 = createRule('first_rule', 200, 0, 0.0);
     const rules = [rule1];
     cache.updateRules(rules);
-    expect((cache as any).ruleAppliers.length).toEqual(1);
-    expect((cache as any).ruleAppliers[0].samplingRule.RuleName).toEqual(
+    expect(cache['ruleAppliers'].length).toEqual(1);
+    expect(cache['ruleAppliers'][0].samplingRule.RuleName).toEqual(
       'first_rule'
     );
 
     const replacement_rule1 = createRule('second_rule', 200, 0, 0.0);
     const replacementRules = [replacement_rule1];
     cache.updateRules(replacementRules);
-    expect((cache as any).ruleAppliers.length).toEqual(1);
-    expect((cache as any).ruleAppliers[0].samplingRule.RuleName).toEqual(
+    expect(cache['ruleAppliers'].length).toEqual(1);
+    expect(cache['ruleAppliers'][0].samplingRule.RuleName).toEqual(
       'second_rule'
     );
   });

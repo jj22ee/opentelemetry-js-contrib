@@ -56,13 +56,13 @@ describe('AWSXRayRemoteSampler', () => {
       resource: emptyResource(),
     });
 
-    expect((sampler as any)._root._root.rulePoller).not.toBeFalsy();
-    expect((sampler as any)._root._root.rulePollingIntervalMillis).toEqual(
+    expect(sampler['internalXraySampler']['rulePoller']).not.toBeFalsy();
+    expect(sampler['internalXraySampler']['rulePollingIntervalMillis']).toEqual(
       300 * 1000
     );
-    expect((sampler as any)._root._root.samplingClient).not.toBeFalsy();
-    expect((sampler as any)._root._root.ruleCache).not.toBeFalsy();
-    expect((sampler as any)._root._root.clientId).toMatch(/[a-f0-9]{24}/);
+    expect(sampler['internalXraySampler']['samplingClient']).not.toBeFalsy();
+    expect(sampler['internalXraySampler']['ruleCache']).not.toBeFalsy();
+    expect(sampler['internalXraySampler']['clientId']).toMatch(/[a-f0-9]{24}/);
   });
 
   it('testCreateRemoteSamplerWithPopulatedResource', () => {
@@ -72,16 +72,16 @@ describe('AWSXRayRemoteSampler', () => {
     });
     sampler = new AWSXRayRemoteSampler({ resource: resource });
 
-    expect((sampler as any)._root._root.rulePoller).not.toBeFalsy();
-    expect((sampler as any)._root._root.rulePollingIntervalMillis).toEqual(
+    expect(sampler['internalXraySampler']['rulePoller']).not.toBeFalsy();
+    expect(sampler['internalXraySampler']['rulePollingIntervalMillis']).toEqual(
       300 * 1000
     );
-    expect((sampler as any)._root._root.samplingClient).not.toBeFalsy();
-    expect((sampler as any)._root._root.ruleCache).not.toBeFalsy();
+    expect(sampler['internalXraySampler']['samplingClient']).not.toBeFalsy();
+    expect(sampler['internalXraySampler']['ruleCache']).not.toBeFalsy();
     expect(
-      ((sampler as any)._root._root.ruleCache as any).samplerResource.attributes
+      sampler['internalXraySampler']['ruleCache']['samplerResource'].attributes
     ).toEqual(resource.attributes);
-    expect((sampler as any)._root._root.clientId).toMatch(/[a-f0-9]{24}/);
+    expect(sampler['internalXraySampler']['clientId']).toMatch(/[a-f0-9]{24}/);
   });
 
   it('testCreateRemoteSamplerWithAllFieldsPopulated', () => {
@@ -95,19 +95,19 @@ describe('AWSXRayRemoteSampler', () => {
       pollingInterval: 120, // seconds
     });
 
-    expect((sampler as any)._root._root.rulePoller).not.toBeFalsy();
-    expect((sampler as any)._root._root.rulePollingIntervalMillis).toEqual(
+    expect(sampler['internalXraySampler']['rulePoller']).not.toBeFalsy();
+    expect(sampler['internalXraySampler']['rulePollingIntervalMillis']).toEqual(
       120 * 1000
     );
-    expect((sampler as any)._root._root.samplingClient).not.toBeFalsy();
-    expect((sampler as any)._root._root.ruleCache).not.toBeFalsy();
+    expect(sampler['internalXraySampler']['samplingClient']).not.toBeFalsy();
+    expect(sampler['internalXraySampler']['ruleCache']).not.toBeFalsy();
     expect(
-      ((sampler as any)._root._root.ruleCache as any).samplerResource.attributes
+      sampler['internalXraySampler']['ruleCache']['samplerResource'].attributes
     ).toEqual(resource.attributes);
-    expect((sampler as any)._root._root.awsProxyEndpoint).toEqual(
+    expect(sampler['internalXraySampler']['awsProxyEndpoint']).toEqual(
       'http://abc.com'
     );
-    expect((sampler as any)._root._root.clientId).toMatch(/[a-f0-9]{24}/);
+    expect(sampler['internalXraySampler']['clientId']).toMatch(/[a-f0-9]{24}/);
   });
 
   it('testUpdateSamplingRulesAndTargetsWithPollersAndShouldSample', done => {
@@ -126,7 +126,7 @@ describe('AWSXRayRemoteSampler', () => {
 
     setTimeout(() => {
       expect(
-        ((sampler as any)._root._root.ruleCache as any).ruleAppliers[0]
+        sampler['internalXraySampler']['ruleCache']['ruleAppliers'][0]
           .samplingRule.RuleName
       ).toEqual('test');
       expect(
@@ -146,7 +146,7 @@ describe('AWSXRayRemoteSampler', () => {
   });
 
   it('generates valid ClientId', () => {
-    const clientId: string = (_AWSXRayRemoteSampler as any).generateClientId();
+    const clientId: string = _AWSXRayRemoteSampler['generateClientId']();
     const match: RegExpMatchArray | null = clientId.match(/[0-9a-z]{24}/g);
     expect(match).not.toBeNull();
   });
