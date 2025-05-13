@@ -70,9 +70,7 @@ describe('RuleCache', () => {
 
     // Default rule should be removed because it doesn't exist in the new list
     expect(cache['ruleAppliers'].length).toEqual(rules.length);
-    expect(cache['ruleAppliers'][0].samplingRule.RuleName).toEqual(
-      'high'
-    );
+    expect(cache['ruleAppliers'][0].samplingRule.RuleName).toEqual('high');
     expect(cache['ruleAppliers'][1].samplingRule.RuleName).toEqual('A');
     expect(cache['ruleAppliers'][2].samplingRule.RuleName).toEqual('Abc');
     expect(cache['ruleAppliers'][3].samplingRule.RuleName).toEqual('ab');
@@ -111,15 +109,11 @@ describe('RuleCache', () => {
 
     // Check rule cache is still correct length and has correct rules
     expect(cache['ruleAppliers'].length).toEqual(3);
-    expect(cache['ruleAppliers'][0].samplingRule.RuleName).toEqual(
-      'rule_1'
-    );
+    expect(cache['ruleAppliers'][0].samplingRule.RuleName).toEqual('rule_1');
     expect(cache['ruleAppliers'][1].samplingRule.RuleName).toEqual(
       'new_rule_3'
     );
-    expect(cache['ruleAppliers'][2].samplingRule.RuleName).toEqual(
-      'rule_2'
-    );
+    expect(cache['ruleAppliers'][2].samplingRule.RuleName).toEqual('rule_2');
 
     // Assert before and after of rule cache
     expect(ruleAppliersCopy[0]).toEqual(cache['ruleAppliers'][0]);

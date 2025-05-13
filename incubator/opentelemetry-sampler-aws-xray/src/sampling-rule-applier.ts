@@ -53,16 +53,10 @@ import {
   ATTR_AWS_LAMBDA_INVOKED_ARN,
   ATTR_CLOUD_RESOURCE_ID,
 } from './semconv';
-import {
-  ISamplingRule,
-  SamplingTargetDocument,
-} from './types';
+import { ISamplingRule, SamplingTargetDocument } from './types';
 import { SamplingRule } from './sampling-rule';
 import { Statistics } from './statistics';
 import { CLOUD_PLATFORM_MAPPING, attributeMatch, wildcardMatch } from './utils';
-
-// Max date time in JavaScript
-const MAX_DATE_TIME_MILLIS: number = new Date(8_640_000_000_000_000).getTime();
 
 export class SamplingRuleApplier {
   public samplingRule: SamplingRule;
@@ -158,7 +152,7 @@ export class SamplingRuleApplier {
     let result: SamplingResult = { decision: SamplingDecision.NOT_RECORD };
 
     // TODO: Apply Reservoir Sampling
-    
+
     if (result.decision === SamplingDecision.NOT_RECORD) {
       result = this.fixedRateSampler.shouldSample(context, traceId);
     }

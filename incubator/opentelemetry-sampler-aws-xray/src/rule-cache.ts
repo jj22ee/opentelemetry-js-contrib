@@ -18,12 +18,8 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import { Attributes, diag } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
-import {
-  ISamplingStatistics,
-  SamplingStatisticsDocument,
-} from './types';
 import { SamplingRuleApplier } from './sampling-rule-applier';
 
 // The cache expires 1 hour after the last refresh time.

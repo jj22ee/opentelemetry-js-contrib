@@ -36,15 +36,9 @@ import { FallbackSampler } from './fallback-sampler';
 import {
   AWSXRayRemoteSamplerConfig,
   GetSamplingRulesResponse,
-  GetSamplingTargetsBody,
-  GetSamplingTargetsResponse,
   SamplingRuleRecord,
-  SamplingTargetDocument,
-  TargetMap,
 } from './types';
-import {
-  RuleCache,
-} from './rule-cache';
+import { RuleCache } from './rule-cache';
 
 import { SamplingRuleApplier } from './sampling-rule-applier';
 
